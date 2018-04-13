@@ -154,28 +154,34 @@ bot.dialog('FindDC', [
 
 				//Remove dl, dt, dd tags, dt elements
 
-				//Remove white space after '>'
-				//carrilloBody = carrilloBody.replace(/(>\s+)/g, '>');
-
-				//Remove white space after newline
-				carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '');
-				
-				//Remove all dl and /dl tags
-				carrilloBody = carrilloBody.replace(/(<dl>)/g, '');
-				carrilloBody = carrilloBody.replace(/(<\/dl>)/g, '');
-
-				//Remove any amp; instances, leaving only the &
-				carrilloBody = carrilloBody.replace(/(amp;)/g, '');
-
-				//Remove all dt and content inside
-				carrilloBody = carrilloBody.replace(/(<dt>)([\w\s])+(<\/dt>)/g, '');
-
-				//Remove all dd tags
-				carrilloBody = carrilloBody.replace(/(<dd>)/g, '');
-
-				//Replace all /dd tags with a newline
-				carrilloBody = carrilloBody.replace(/(<\/dd>)/g, '\n');
+				//The master replace line
+				carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
+				delaguerraBody = delaguerraBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
+				ortegaBody = ortegaBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
+				portolaBody = portolaBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
 				console.log(carrilloBody);
+
+
+
+				// //Remove white space after newline
+				// carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '');
+				
+				// //Remove all dl and /dl tags
+				// carrilloBody = carrilloBody.replace(/(<dl>)/g, '');
+				// carrilloBody = carrilloBody.replace(/(<\/dl>)/g, '');
+
+				// //Remove any amp; instances, leaving only the &
+				// carrilloBody = carrilloBody.replace(/(amp;)/g, '');
+
+				// //Remove all dt and content inside
+				// carrilloBody = carrilloBody.replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '');
+
+				// //Remove all dd tags
+				// carrilloBody = carrilloBody.replace(/(<dd>)/g, '');
+
+				// //Replace all /dd tags with a newline
+				// carrilloBody = carrilloBody.replace(/(<\/dd>)/g, '\n');
+				// console.log(carrilloBody);
 
 			});
 		}
