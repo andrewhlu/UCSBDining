@@ -157,41 +157,43 @@ bot.dialog('FindDC', [
 		    	requestBody = body;
 		    });
 			
-			setTimeout(function(){ console.log("success"); }, 3000);
+			setTimeout(function(){ 
+				//Extract menus from website
+				const analyze = cheerio.load(requestBody);
+				var carrilloBody = analyze('#Carrillo-body .panel-body').html();
+				var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
+				var ortegaBody = analyze('#Ortega-body .panel-body').html();
+				var portolaBody = analyze('#Portola-body .panel-body').html();
+
+				//Send menus to menuregex function
+				var carrilloMenu = menuregex(carrilloBody);
+				var delaguerraMenu = menuregex(delaguerraBody);
+				var ortegaMenu = menuregex(ortegaBody);
+				var portolaMenu = menuregex(portolaBody);
+
+				//Get user preferences
+				var preferences = session.userData.userPreferences;
+				console.log(preferences);
+
+				//Analyze menus with user preferences
+				var carrilloResult = analyzeMenu(carrilloMenu, preferences);
+				var delaguerraResult = analyzeMenu(delaguerraMenu, preferences);
+				var ortegaResult = analyzeMenu(ortegaMenu, preferences);
+				var portolaResult = analyzeMenu(portolaMenu, preferences);
+
+				//Find DC with largest count
+				var result = indexOfMax(carrilloResult[0],delaguerraResult[0],ortegaResult[0],portolaResult[0]);
+				console.log(result);
+
+				//Speak to user
+				var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
+				console.log(dc[result]);
+
+				var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + " items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
+				session.say(sayString, sayString);
+			}, 5000);
 			
-			//Extract menus from website
-			const analyze = cheerio.load(requestBody);
-			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
-			var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
-			var ortegaBody = analyze('#Ortega-body .panel-body').html();
-			var portolaBody = analyze('#Portola-body .panel-body').html();
-
-			//Send menus to menuregex function
-			var carrilloMenu = menuregex(carrilloBody);
-			var delaguerraMenu = menuregex(delaguerraBody);
-			var ortegaMenu = menuregex(ortegaBody);
-			var portolaMenu = menuregex(portolaBody);
-
-			//Get user preferences
-			var preferences = session.userData.userPreferences;
-			console.log(preferences);
-
-			//Analyze menus with user preferences
-			var carrilloResult = analyzeMenu(carrilloMenu, preferences);
-			var delaguerraResult = analyzeMenu(delaguerraMenu, preferences);
-			var ortegaResult = analyzeMenu(ortegaMenu, preferences);
-			var portolaResult = analyzeMenu(portolaMenu, preferences);
-
-			//Find DC with largest count
-			var result = indexOfMax(carrilloResult[0],delaguerraResult[0],ortegaResult[0],portolaResult[0]);
-			console.log(result);
-
-			//Speak to user
-			var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
-			console.log(dc[result]);
-
-			var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + " items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
-			session.say(sayString, sayString);
+			
 		}
 	}
 ]);
@@ -372,35 +374,34 @@ bot.dialog('RateSelectedMeal', [
 	    	requestBody = body;
 	    });
 		
-		setTimeout(function(){ console.log("success"); }, 3000);
-		
-		//Extract menus from website
-		const analyze = cheerio.load(requestBody);
-
-		if(ans.search("Carrillo") >= 0) {
-			var menuBody = analyze('#Carrillo-body .panel-body').html();
-		}
-		else if(ans.search("DeLaGuerra") >= 0 || ans.search("De La Guerra") >= 0 || ans.search("DLG") >= 0) {
-			var menuBody = analyze('#DeLaGuerra-body .panel-body').html();
-		}
-		else if(ans.search("Ortega") >= 0) {
-			var menuBody = analyze('#Ortega-body .panel-body').html();
-		}
-		else if(ans.search("Portola") >= 0) {
-			var menuBody = analyze('#Portola-body .panel-body').html();
-		}
-
-		//Send menu to menuregex function
-		var dcMenu = menuregex(menuBody);
-
-		//Convert menu string to array
-		dcMenuArray = dcMenu.split("\n");
-		console.log(dcMenuArray);
-
-		//Move to selectFavorites dialog
-		session.replaceDialog('selectFavorites');
+		setTimeout(function(){
+			//Extract menus from website
+			const analyze = cheerio.load(requestBody);
+	
+			if(ans.search("Carrillo") >= 0) {
+				var menuBody = analyze('#Carrillo-body .panel-body').html();
+			}
+			else if(ans.search("DeLaGuerra") >= 0 || ans.search("De La Guerra") >= 0 || ans.search("DLG") >= 0) {
+				var menuBody = analyze('#DeLaGuerra-body .panel-body').html();
+			}
+			else if(ans.search("Ortega") >= 0) {
+				var menuBody = analyze('#Ortega-body .panel-body').html();
+			}
+			else if(ans.search("Portola") >= 0) {
+				var menuBody = analyze('#Portola-body .panel-body').html();
+			}
+	
+			//Send menu to menuregex function
+			var dcMenu = menuregex(menuBody);
+	
+			//Convert menu string to array
+			dcMenuArray = dcMenu.split("\n");
+			console.log(dcMenuArray);
+	
+			//Move to selectFavorites dialog
+			session.replaceDialog('selectFavorites');
+		}, 3000);
 	}
-
 ]);
 
 bot.dialog('selectFavorites', [
