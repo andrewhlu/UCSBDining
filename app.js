@@ -37,7 +37,7 @@ var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.
 var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
 
 //Define global requestBody for request function
-var requestBody = "";
+var requestBody = "blank";
 
 // Create your bot with a function to receive messages from the user
 
