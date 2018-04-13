@@ -40,7 +40,8 @@ var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azu
 
 var bot = new builder.UniversalBot(connector, function (session) {
 	session.replaceDialog('Startup');
-});
+})
+.set('storage', tableStorage);
 
 bot.dialog('Startup', [
 	function (session) {
@@ -104,10 +105,6 @@ bot.dialog('Startup', [
 	}
 ]);
 
-//get initial text
-//see if they passed a meal period over (breakfast, lunch, dinner)
-//if not, then take the next meal
-	
 bot.dialog('FindDC', [
 	function (session) {
 		session.say("Give me a moment to look at the menu.","Give me a moment to look at the menu.");
@@ -142,8 +139,9 @@ bot.dialog('FindDC', [
 		request(requestString, function (error, response, body) {
 			  console.log('error:', error); // Print the error if one occurred
 			  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-			  //session.replaceDialog('Startup');
-			  analyzeMeal(body);
+			  console.log('body:', body);
+
+			  //analyzeMeal(body);
 			});
 
 
