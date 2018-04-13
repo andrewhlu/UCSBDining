@@ -74,7 +74,8 @@ bot.dialog('Startup', [
 		console.log(preferences);
 
 		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
-			//run finished script
+			session.say("Great! Let's rate your meal.","Great! Let's rate your meal.");
+			session.replaceDialog('RateMeal');
 		}
 		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
 			var sayString = "Hello, " + name + "! Let's find you a good place to eat.";
@@ -105,7 +106,8 @@ bot.dialog('Startup', [
 		//add first time script
 		
 		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
-			//run finished script
+			session.say("Great! Let's rate your meal.","Great! Let's rate your meal.");
+			session.replaceDialog('RateMeal');
 		}
 		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
 			session.say("Great! Let's find you a good place to eat.","Great! Let's find you a good place to eat.");
