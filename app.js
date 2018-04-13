@@ -39,39 +39,71 @@ var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azu
 // Create your bot with a function to receive messages from the user
 
 var bot = new builder.UniversalBot(connector, function (session) {
-	var ans = results.response.entity;
-	var msg = "You entered: " + ans;
-	console.log(msg);
-
-	//User Info stuff. Play around with this later.
-	// if(session.message && session.message.entities){
-	// 	var userInfo = session.message.entities.find((e) => {
-	// 		return e.type === 'UserInfo';
-	// 	});
-
-	// 	if (userInfo) {
-	// 		var name = userInfo['UserName'];
-	// 		var email = userInfo['UserEmail'];
-
-	// 		if(email && email !== ''){
-	// 			//Do something with the user's email address.
-	// 		}
-	// 	}
-	// }
-	
-	if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
-		//run finished script
-	}
-	else {
-		session.replaceDialog('FindDC');
-	}
+	session.replaceDialog('Startup');
 });
+
+bot.dialog('Startup', [
+	function (session) {
+		var ans = session.message.text;
+		var msg = "You entered: " + ans;
+		console.log(msg);
+		
+		//User Info stuff. Play around with this later.
+		if(session.message && session.message.entities){
+			var userInfo = session.message.entities.find((e) => {
+				return e.type === 'UserInfo';
+			});
 	
-bot.dialog('FindDC', [
-	function (session) {       
+			if (userInfo) {
+				var name = userInfo['UserName'];
+				console.log(userInfo);
+				console.log(name);
+			}
+		}
+		
+		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+			//run finished script
+		}
+		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
+			session.say("Hello! Let's find you a good place to eat.");
+			session.replaceDialog('FindDC');
+		}
+		else {
+			var choices = [
+	            {value: 'eat', action: {title: 'Eat!'}, synonyms: 'Recommend|Food|Hungry'},
+	            {value: 'rate', action: {title: 'Rate!'}, synonyms: 'Done|Finish|Finished'}
+	        ];
+	        
+	        builder.Prompts.choice(session, "What would you like to do?", choices, {
+	            listStyle: builder.ListStyle.button,
+	            speak: speak(session, 'Hello! What would you like to do? Would you like to eat or rate a meal?') 
+	        });
+		}
+	},
+	function (session, results) {
 		var ans = results.response.entity;
 		var msg = "You entered: " + ans;
-		console.log(msg); 
+		console.log(msg);
+		
+		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+			//run finished script
+		}
+		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
+			session.say("Great! Let's find you a good place to eat.");
+			session.replaceDialog('FindDC');
+		}
+		else {
+			session.say("I'm sorry, I didn't understand. Let's try again.");
+			session.replaceDialog('Startup');
+		}
+	}
+]);
+	
+bot.dialog('FindDC', [
+	function (session) {
+		// var ans = results.response.entity;
+		// var msg = "You entered: " + ans;
+		// console.log(msg);
 		
 		//get initial text
 		//see if they passed a meal period over (breakfast, lunch, dinner)
