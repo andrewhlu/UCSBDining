@@ -159,10 +159,10 @@ bot.dialog('FindDC', [
 
 				//Remove all dl and /dl tags
 				carrilloBody = carrilloBody.replace(/(<dl>)/g, '>');
-				carrilloBody = carrilloBody.replace(/(</dl>)/g, '>');
+				carrilloBody = carrilloBody.replace(/(<\/dl>)/g, '>');
 
 				//Remove all dt and content inside
-				carrilloBody = carrilloBody.replace(/(<dt>)([\w\s])+(</dt>)/g, ''));
+				carrilloBody = carrilloBody.replace(/(<dt>)([\w\s])+(<\/dt>)/g, '');
 				console.log(carrilloBody);
 
 
