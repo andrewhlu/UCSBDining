@@ -155,16 +155,27 @@ bot.dialog('FindDC', [
 				//Remove dl, dt, dd tags, dt elements
 
 				//Remove white space after '>'
-				carrilloBody = carrilloBody.replace(/(>\s+)/g, '>');
+				//carrilloBody = carrilloBody.replace(/(>\s+)/g, '>');
 
+				//Remove white space after newline
+				carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '');
+				
 				//Remove all dl and /dl tags
 				carrilloBody = carrilloBody.replace(/(<dl>)/g, '');
 				carrilloBody = carrilloBody.replace(/(<\/dl>)/g, '');
+
+				//Remove any amp; instances, leaving only the &
+				carrilloBody = carrilloBody.replace(/(amp;)/g, '');
 
 				//Remove all dt and content inside
 				carrilloBody = carrilloBody.replace(/(<dt>)([\w\s])+(<\/dt>)/g, '');
 				console.log(carrilloBody);
 
+				//Remove all dd tags
+				carrilloBody = carrilloBody.replace(/(<dd>)/g, '');
+
+				//Replace all /dd tags with a newline
+				carrilloBody = carrilloBody.replace(/(<\/dd>)/g, '\n');
 
 			});
 		}
