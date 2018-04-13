@@ -153,7 +153,9 @@ bot.dialog('FindDC', [
 				var portolaBody = analyze('#Portola-body .panel-body').html();
 
 				//Remove dl, dt, dd tags, dt elements
-				carrilloBody = carrilloBody.replace(/(>\s)/g, '');
+
+				//Remove white space after '>'
+				carrilloBody = carrilloBody.replace(/(>\s+)/g, '>');
 				console.log(carrilloBody);
 
 
