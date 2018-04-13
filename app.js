@@ -48,16 +48,15 @@ bot.dialog('Startup', [
 		var msg = "You entered: " + ans;
 		console.log(msg);
 		
-		//User Info stuff. Play around with this later.
+		//User Info
 		if(session.message && session.message.entities){
 			var userInfo = session.message.entities.find((e) => {
 				return e.type === 'UserInfo';
 			});
 	
 			if (userInfo) {
-				var name = userInfo['UserName'];
-				console.log(userInfo);
-				console.log(name);
+				var name = userInfo.name.GivenName;
+				//console.log(name);
 			}
 		}
 		
@@ -65,7 +64,8 @@ bot.dialog('Startup', [
 			//run finished script
 		}
 		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
-			session.say("Hello! Let's find you a good place to eat.");
+			var sayString = "Hello, " + name + "! Let's find you a good place to eat.";
+			session.say(sayString, sayString);
 			session.replaceDialog('FindDC');
 		}
 		else {
@@ -73,10 +73,13 @@ bot.dialog('Startup', [
 	            {value: 'eat', action: {title: 'Eat!'}, synonyms: 'Recommend|Food|Hungry'},
 	            {value: 'rate', action: {title: 'Rate!'}, synonyms: 'Done|Finish|Finished'}
 	        ];
+			
+			var string1 = "Hello, " + name + "! What would you like to do?";
+			var string2 = "Hello, " + name + "! What would you like to do? Would you like to eat or rate a meal?";
 	        
-	        builder.Prompts.choice(session, "What would you like to do?", choices, {
+	        builder.Prompts.choice(session, string1, choices, {
 	            listStyle: builder.ListStyle.button,
-	            speak: speak(session, 'Hello! What would you like to do? Would you like to eat or rate a meal?') 
+	            speak: speak(session, string2) 
 	        });
 		}
 	},
@@ -85,44 +88,87 @@ bot.dialog('Startup', [
 		var msg = "You entered: " + ans;
 		console.log(msg);
 		
+		//add a FindDCFuture for future meals
+		
 		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			//run finished script
 		}
 		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
-			session.say("Great! Let's find you a good place to eat.");
+			session.say("Great! Let's find you a good place to eat.","Great! Let's find you a good place to eat.");
 			session.replaceDialog('FindDC');
 		}
 		else {
-			session.say("I'm sorry, I didn't understand. Let's try again.");
+			session.say("I'm sorry, I didn't understand. Let's try again.","I'm sorry, I didn't understand. Let's try again.");
 			session.replaceDialog('Startup');
 		}
 	}
 ]);
+
+//get initial text
+//see if they passed a meal period over (breakfast, lunch, dinner)
+//if not, then take the next meal
 	
 bot.dialog('FindDC', [
 	function (session) {
-		// var ans = results.response.entity;
-		// var msg = "You entered: " + ans;
-		// console.log(msg);
+		session.say("Give me a moment to look at the menu.","Give me a moment to look at the menu.");
 		
-		//get initial text
-		//see if they passed a meal period over (breakfast, lunch, dinner)
-		//if not, then take the next meal
+		var utcdate = new Date(); //Local time is UTC
+		var utcMilli = utcdate.getTime();
 		
-		session.say("Let me look at the menus.","Let me look at the menus.");
+		var date = new Date(utcMilli - 25200000); //Converts UTC time to PST
+		console.log(date.toLocaleString());
 		
-		requestMeal(3);
+		var year = date.getFullYear();
+		var month = parseInt(date.getMonth()) + 1;
+		var day = date.getDate();
+		var weekday = date.getDay();
+		var hour = date.getHours();
+		
+		var dateString = year + "-" + month + "-" + day;
+		
+		var dchours = [[2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,4,4,4,4,4,0,0,0,0],[1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,4,4,4,4,4,5,5,5,5],[1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,4,4,4,4,4,5,5,5,5],[1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,4,4,4,4,4,5,5,5,5],[1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,4,4,4,4,4,5,5,5,5],[1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,4,4,4,4,4,0,0,0,0],[2,2,2,2,2,2,2,2,2,2,2,2,2,2,4,4,4,4,4,4,0,0,0,0]];
+		//1 = breakfast
+		//2 = brunch
+		//3 = lunch
+		//4 = dinner
+		//5 = late night
+		//0 = closed for day
+		
+		if(dchours[weekday][hour] == 1) {
+			requestMeal("Breakfast",dateString);
+		}
+		else if(dchours[weekday][hour] == 2) {
+			requestMeal("Brunch",dateString);
+		}
+		else if(dchours[weekday][hour] == 3) {
+			requestMeal("Lunch",dateString);
+		}
+		else if(dchours[weekday][hour] == 4) {
+			requestMeal("Dinner",dateString);
+		}
+		else if(dchours[weekday][hour] == 5) {
+			requestMeal("Late Night",dateString);
+		}
+		else {
+			session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
+		}
+
+		
+		// //User Info
+		// if(session.message && session.message.entities){
+		// 	var userInfo = session.message.entities.find((e) => {
+		// 		return e.type === 'UserInfo';
+		// 	});
+	
+		// 	if (userInfo) {
+		// 		var name = userInfo.name.GivenName;
+		// 		var email = userInfo.email;
+		// 		console.log(email);
+		// 	}
+		// }
 		
 		
-		// var body = fetch('https://appl.housing.ucsb.edu/menu/day/?dc=Carrillo&dc=DeLaGuerra&dc=Ortega&dc=Portola&m=Breakfast')
-		//     .then(res => res.text())
-		//     .then(body => cheerio.load(body));
-				  
-		//   .then(menu => ('#Carrillo-body dd').html())
-		//   .then(console.log(menu));
-		
-		
-		//const $ = cheerio.load(test)
+
 		
 		//scrap the website
 		//extract the meal time
@@ -161,17 +207,8 @@ function speak(session, prompt) {
 }
 
 //Request function
-function requestMeal(meal) {
-	var meals = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late Night"];
-	
-	var date = new Date();
-	console.log(date.toLocaleString());
-	
-	var month = parseInt(date.getMonth()) + 1;
-	
-	var dateString = date.getFullYear() + "-" + month + "-" + date.getDate();
-	
-	var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + meals[meal];
+function requestMeal(meal, dateString) {
+	var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + meal;
 	console.log(requestString);
 	
 	request(requestString, function (error, response, body) {
