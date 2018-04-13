@@ -64,6 +64,7 @@ bot.dialog('Startup', [
 		//add a FindDCFuture for future meals
 		//add first time script
 
+		session.userData.userPreferences = ["BBQ Spareribs","Salad","Grilled Pork Tacos"];
 		var preferences = session.userData.userPreferences;
 		console.log(preferences);
 
@@ -71,7 +72,7 @@ bot.dialog('Startup', [
 			var sayString = "Hello, " + name + "! It looks like it's your first time here! Let's get you set up.";
 			session.say(sayString, sayString);
 
-			session.userData.userPreferences = ["BBQ Spareribs","Salad"];
+			
 			var preferences = session.userData.userPreferences;
 			console.log(preferences);
 		}
@@ -181,7 +182,13 @@ bot.dialog('FindDC', [
 				var delaguerraResult = analyzeMenu(delaguerraMenu, preferences);
 				var ortegaResult = analyzeMenu(ortegaMenu, preferences);
 				var portolaResult = analyzeMenu(portolaMenu, preferences);
-				
+
+				//Find DC with largest count
+				var result = indexOfMax(carrilloResult[0],delaguerraResult[0],ortegaResult[0],portolaResult[0]);
+				console.log(result);
+
+				var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
+				console.log(dc[result]);
 
 			});
 		}
@@ -267,4 +274,22 @@ function analyzeMenu(menu, preferences) {
 	console.log(goodfood);
 
 	return [goodfoodcount, goodfood];
+}
+
+function indexOfMax(arr) {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    var max = arr[0];
+    var maxIndex = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            maxIndex = i;
+            max = arr[i];
+        }
+    }
+
+    return maxIndex;
 }
