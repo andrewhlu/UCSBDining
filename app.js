@@ -60,6 +60,16 @@ bot.dialog('Startup', [
 				//console.log(name);
 			}
 		}
+
+		//add a FindDCFuture for future meals
+		//add first time script
+
+		var preferences = session.userData.userPreferences;
+		console.log(preferences);
+
+		session.userData.userPreferences = ["BBQ Spareribs","Salad"];
+		var preferences = session.userData.userPreferences;
+		console.log(preferences);
 		
 		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			//run finished script
@@ -90,6 +100,7 @@ bot.dialog('Startup', [
 		console.log(msg);
 		
 		//add a FindDCFuture for future meals
+		//add first time script
 		
 		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			//run finished script
