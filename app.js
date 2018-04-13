@@ -64,7 +64,7 @@ bot.dialog('Startup', [
 		//add a FindDCFuture for future meals
 		//add first time script
 
-		session.userData.userPreferences = ["BBQ Spareribs","Salad","Grilled Pork Tacos"];
+		session.userData.userPreferences = ["BBQ Spareribs","Salad","Grilled Pork Tacos","Krinkle Cut Fries"]; //remove this line!!
 		var preferences = session.userData.userPreferences;
 		console.log(preferences);
 
@@ -187,45 +187,14 @@ bot.dialog('FindDC', [
 				var result = indexOfMax(carrilloResult[0],delaguerraResult[0],ortegaResult[0],portolaResult[0]);
 				console.log(result);
 
+				//Speak to user
 				var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
 				console.log(dc[result]);
 
+				var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + "items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
+				session.say(sayString, sayString);
 			});
 		}
-
-
-
-		
-
-		
-		
-		//scrap the website
-		//extract the meal time
-		//extract the menus
-		//compare with your tallies
-		//dc with most tallies gets chosen and returned
-		
-		
-		
-	},
-	function (session, results) {
-		var ans = results.response.entity;
-		var msg = "You entered: " + ans;
-		console.log(msg);
-		//session.send(msg);
-		
-		session.say(msg, msg);
-		
-		// name = results.response;
-		builder.Prompts.text(session, "We need a little more information about you to predict your favorite dog. Hang in there and tell me your current city");
-	},
-	function (session, results) {
-		city = results.response;
-		var msg = "Name: " + name + "<br/> City: " + city;
-		console.log(msg);
-		session.send(msg);
-		
-		session.send("Thanks. We're launching a webpage for you."); 
 	}
 ]);
 
