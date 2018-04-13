@@ -135,27 +135,34 @@ bot.dialog('FindDC', [
 		
 		var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + mealname[dchours[weekday][hour]];
 		console.log(requestString);
+
+		if(mealname[dchours[weekday][hour]] == 0) {
+			session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
+		}
+		else {
+			request(requestString, function (error, response, body) {
+				console.log('error:', error); // Print the error if one occurred
+				console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+				//console.log('body:', body);
+
+				//Extract menus from website
+				const analyze = cheerio.load(body);
+				var carrilloBody = analyze('#Carrillo-body .panel-body').html();
+				var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
+				var ortegaBody = analyze('#Ortega-body .panel-body').html();
+				var portolaBody = analyze('#Portola-body .panel-body').html();
+
+				//Remove dl, dt, dd tags, dt elements
+				carrilloBody = carrilloBody.replace(/(>\s)/g, '');
+				console.log(carrilloBody);
+
+
+			});
+		}
+
+
+
 		
-		request(requestString, function (error, response, body) {
-			console.log('error:', error); // Print the error if one occurred
-			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-			console.log('body:', body);
-
-			//Extract menus from website
-			const analyze = cheerio.load(body);
-			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
-			var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
-			var ortegaBody = analyze('#Ortega-body .panel-body').html();
-			var portolaBody = analyze('#Portola-body .panel-body').html();
-
-			//Place dd elements into array
-			carrilloBody = carrilloBody.replace(/\s+/g, '');
-			console.log(carrilloBody);
-		});
-
-
-
-		//session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
 
 		
 		
