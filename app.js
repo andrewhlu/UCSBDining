@@ -152,36 +152,18 @@ bot.dialog('FindDC', [
 				var ortegaBody = analyze('#Ortega-body .panel-body').html();
 				var portolaBody = analyze('#Portola-body .panel-body').html();
 
-				//Remove dl, dt, dd tags, dt elements
-
 				//The master replace line
-				carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
-				delaguerraBody = delaguerraBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
-				ortegaBody = ortegaBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
-				portolaBody = portolaBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
-				console.log(carrilloBody);
-
-
-
-				// //Remove white space after newline
-				// carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '');
+				//carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
 				
-				// //Remove all dl and /dl tags
-				// carrilloBody = carrilloBody.replace(/(<dl>)/g, '');
-				// carrilloBody = carrilloBody.replace(/(<\/dl>)/g, '');
+				//Send menus to menuregex function
+				var carrilloMenu = menuregex(carrilloBody);
+				var delaguerraMenu = menuregex(delaguerraBody);
+				var ortegaMenu = menuregex(ortegaBody);
+				var portolaMenu = menuregex(portolaBody);
 
-				// //Remove any amp; instances, leaving only the &
-				// carrilloBody = carrilloBody.replace(/(amp;)/g, '');
 
-				// //Remove all dt and content inside
-				// carrilloBody = carrilloBody.replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '');
 
-				// //Remove all dd tags
-				// carrilloBody = carrilloBody.replace(/(<dd>)/g, '');
-
-				// //Replace all /dd tags with a newline
-				// carrilloBody = carrilloBody.replace(/(<\/dd>)/g, '\n');
-				// console.log(carrilloBody);
+				
 
 			});
 		}
@@ -228,4 +210,30 @@ bot.dialog('FindDC', [
 function speak(session, prompt) {
 	var localized = session.gettext(prompt);
 	return ssml.speak(localized);
+}
+
+function menuregex(menu) {
+	//Remove white space after newline
+	menu = menu.replace(/(\n)(\s)+/g, '');
+	
+	//Remove all dl and /dl tags
+	menu = menu.replace(/(<dl>)/g, '');
+	menu = menu.replace(/(<\/dl>)/g, '');
+
+	//Change &amp; to &, &apos; to '
+	menu = menu.replace(/(&amp;)/g, '&');
+	menu = menu.replace(/(&apos;)/g, '\'');
+
+	//Remove all dt and content inside
+	menu = menu.replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '');
+
+	//Remove all dd tags
+	menu = menu.replace(/(<dd>)/g, '');
+
+	//Replace all /dd tags with a newline
+	menu = menu.replace(/(<\/dd>)/g, '\n');
+
+	console.log(menu);
+
+	return menu;
 }
