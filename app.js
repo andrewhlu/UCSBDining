@@ -154,7 +154,7 @@ bot.dialog('FindDC', [
 		console.log(requestString);
 
 		if(mealname[dchours[weekday][hour]] == 0) {
-			session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
+			session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!","Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
 		}
 		else {
 			// request(requestString, function (error, response, body) {
@@ -163,16 +163,17 @@ bot.dialog('FindDC', [
 			// 	requestBody = body;
 			// 	console.log("Request Body 1: " + requestBody);
 			// });
-			// console.log("Request Body 1: " + requestBody);
+			// console.log("Request Body 2: " + requestBody);
 
 			fetch(requestString)
 		    .then(res => res.text())
 		    .then(body => {
 		    	requestBody = body;
 		    	console.log("Request Body 1: " + requestBody);
+		    	session.say("This worked!","This worked!")
 		    });
 
-			console.log("Request Body 1: " + requestBody);
+			console.log("Request Body 2: " + requestBody);
 			//Extract menus from website
 			const analyze = cheerio.load(requestBody);
 			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
