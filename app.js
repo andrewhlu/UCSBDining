@@ -36,6 +36,9 @@ var tableName = 'botdata';
 var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
 var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
 
+//Define global requestBody for request function
+var requestBody = "";
+
 // Create your bot with a function to receive messages from the user
 
 var bot = new builder.UniversalBot(connector, function (session) {
@@ -157,41 +160,42 @@ bot.dialog('FindDC', [
 			request(requestString, function (error, response, body) {
 				console.log('error:', error); // Print the error if one occurred
 				console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-
-				//Extract menus from website
-				const analyze = cheerio.load(body);
-				var carrilloBody = analyze('#Carrillo-body .panel-body').html();
-				var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
-				var ortegaBody = analyze('#Ortega-body .panel-body').html();
-				var portolaBody = analyze('#Portola-body .panel-body').html();
-
-				//Send menus to menuregex function
-				var carrilloMenu = menuregex(carrilloBody);
-				var delaguerraMenu = menuregex(delaguerraBody);
-				var ortegaMenu = menuregex(ortegaBody);
-				var portolaMenu = menuregex(portolaBody);
-
-				//Get user preferences
-				var preferences = session.userData.userPreferences;
-				console.log(preferences);
-
-				//Analyze menus with user preferences
-				var carrilloResult = analyzeMenu(carrilloMenu, preferences);
-				var delaguerraResult = analyzeMenu(delaguerraMenu, preferences);
-				var ortegaResult = analyzeMenu(ortegaMenu, preferences);
-				var portolaResult = analyzeMenu(portolaMenu, preferences);
-
-				//Find DC with largest count
-				var result = indexOfMax(carrilloResult[0],delaguerraResult[0],ortegaResult[0],portolaResult[0]);
-				console.log(result);
-
-				//Speak to user
-				var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
-				console.log(dc[result]);
-
-				var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + "items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
-				session.say(sayString, sayString);
+				requestBody = body;
 			});
+
+			//Extract menus from website
+			const analyze = cheerio.load(requestBody);
+			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
+			var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
+			var ortegaBody = analyze('#Ortega-body .panel-body').html();
+			var portolaBody = analyze('#Portola-body .panel-body').html();
+
+			//Send menus to menuregex function
+			var carrilloMenu = menuregex(carrilloBody);
+			var delaguerraMenu = menuregex(delaguerraBody);
+			var ortegaMenu = menuregex(ortegaBody);
+			var portolaMenu = menuregex(portolaBody);
+
+			//Get user preferences
+			var preferences = session.userData.userPreferences;
+			console.log(preferences);
+
+			//Analyze menus with user preferences
+			var carrilloResult = analyzeMenu(carrilloMenu, preferences);
+			var delaguerraResult = analyzeMenu(delaguerraMenu, preferences);
+			var ortegaResult = analyzeMenu(ortegaMenu, preferences);
+			var portolaResult = analyzeMenu(portolaMenu, preferences);
+
+			//Find DC with largest count
+			var result = indexOfMax(carrilloResult[0],delaguerraResult[0],ortegaResult[0],portolaResult[0]);
+			console.log(result);
+
+			//Speak to user
+			var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
+			console.log(dc[result]);
+
+			var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + "items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
+			session.say(sayString, sayString);
 		}
 	}
 ]);
