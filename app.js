@@ -141,12 +141,16 @@ bot.dialog('FindDC', [
 			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
 			console.log('body:', body);
 
-			//analyzeMeal(body);
+			//Extract menus from website
 			const analyze = cheerio.load(body);
 			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
 			var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
 			var ortegaBody = analyze('#Ortega-body .panel-body').html();
 			var portolaBody = analyze('#Portola-body .panel-body').html();
+
+			//Place dd elements into array
+			carrilloBody = carrilloBody.replace(/\s+/g, '');
+			console.log(carrilloBody);
 		});
 
 
