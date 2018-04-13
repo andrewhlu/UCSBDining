@@ -156,6 +156,13 @@ bot.dialog('FindDC', [
 
 				//Remove white space after '>'
 				carrilloBody = carrilloBody.replace(/(>\s+)/g, '>');
+
+				//Remove all dl and /dl tags
+				carrilloBody = carrilloBody.replace(/(<dl>)/g, '>');
+				carrilloBody = carrilloBody.replace(/(</dl>)/g, '>');
+
+				//Remove all dt and content inside
+				carrilloBody = carrilloBody.replace(/(<dt>)([\w\s])+(</dt>)/g, ''));
 				console.log(carrilloBody);
 
 
