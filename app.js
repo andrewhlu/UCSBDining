@@ -134,24 +134,21 @@ bot.dialog('FindDC', [
 		//5 = late night
 		//0 = closed for day
 		
-		if(dchours[weekday][hour] == 1) {
-			requestMeal("Breakfast",dateString);
-		}
-		else if(dchours[weekday][hour] == 2) {
-			requestMeal("Brunch",dateString);
-		}
-		else if(dchours[weekday][hour] == 3) {
-			requestMeal("Lunch",dateString);
-		}
-		else if(dchours[weekday][hour] == 4) {
-			requestMeal("Dinner",dateString);
-		}
-		else if(dchours[weekday][hour] == 5) {
-			requestMeal("Late Night",dateString);
-		}
-		else {
-			session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
-		}
+		var mealname = [0,"Breakfast","Brunch","Lunch","Dinner","Late Night"];
+		
+		var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + mealname[dchours[weekday][hour]];
+		console.log(requestString);
+		
+		request(requestString, function (error, response, body) {
+			  console.log('error:', error); // Print the error if one occurred
+			  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+			  //session.replaceDialog('Startup');
+			  analyzeMeal(body);
+			});
+
+
+
+		//session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
 
 		
 		// //User Info
@@ -200,30 +197,29 @@ bot.dialog('FindDC', [
 	}
 ]);
 
-/** Helper function to wrap SSML stored in the prompts file with <speak/> tag. */
+bot.dialog('AnalyzeMenu', [
+	function analyzeMeal(body) {
+		const analyze = cheerio.load(body);
+		var carrillo = analyze('#Carrillo-body .panel-body').html();
+		var dlg = analyze('#DeLaGuerra-body .panel-body').html();
+		var ortega = analyze('#Ortega-body .panel-body').html();
+		var portola = analyze('#Portola-body .panel-body').html();
+	}
+]);
+
+
+
+
+// Helper function to wrap SSML stored in the prompts file with <speak/> tag.
 function speak(session, prompt) {
 	var localized = session.gettext(prompt);
 	return ssml.speak(localized);
 }
 
-//Request function
-function requestMeal(meal, dateString) {
-	var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + meal;
-	console.log(requestString);
-	
-	request(requestString, function (error, response, body) {
-		  console.log('error:', error); // Print the error if one occurred
-		  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-		  analyzeMeal(body);
-		});
-}
-
-function analyzeMeal(body) {
-	//console.log(body);
-	
-	const analyze = cheerio.load(body);
-	var result1 = analyze('#Carrillo-body .panel-body').html();
-	console.log(result1);
-	// var result2 = analyze('#Ortega-body dl').html();
-	// console.log(result2);
-}
+// function analyzeMeal(body) {
+// 	const analyze = cheerio.load(body);
+// 	var carrillo = analyze('#Carrillo-body .panel-body').html();
+// 	var dlg = analyze('#DeLaGuerra-body .panel-body').html();
+// 	var ortega = analyze('#Ortega-body .panel-body').html();
+// 	var portola = analyze('#Portola-body .panel-body').html();
+// }
