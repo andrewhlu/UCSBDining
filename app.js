@@ -225,7 +225,7 @@ function menuregex(menu) {
 	menu = menu.replace(/(&apos;)/g, '\'');
 
 	//Remove all dt and content inside
-	menu = menu.replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '');
+	menu = menu.replace(/(<dt>)([\w\s\(\)\/\&\'])+(<\/dt>)/g, '');
 
 	//Remove all dd tags
 	menu = menu.replace(/(<dd>)/g, '');
