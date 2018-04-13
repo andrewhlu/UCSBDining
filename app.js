@@ -123,8 +123,6 @@ bot.dialog('Startup', [
 
 bot.dialog('FindDC', [
 	function (session) {
-		session.say("Give me a moment to look at the menu.","Give me a moment to look at the menu.");
-		
 		var utcdate = new Date(); //Local time is UTC
 		var utcMilli = utcdate.getTime();
 		
