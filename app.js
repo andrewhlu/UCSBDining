@@ -67,11 +67,15 @@ bot.dialog('Startup', [
 		var preferences = session.userData.userPreferences;
 		console.log(preferences);
 
-		session.userData.userPreferences = ["BBQ Spareribs","Salad"];
-		var preferences = session.userData.userPreferences;
-		console.log(preferences);
-		
-		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+		if(preferences == undefined) {
+			var sayString = "Hello, " + name + "! It looks like it's your first time here! Let's get you set up.";
+			session.say(sayString, sayString);
+
+			session.userData.userPreferences = ["BBQ Spareribs","Salad"];
+			var preferences = session.userData.userPreferences;
+			console.log(preferences);
+		}
+		else if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			//run finished script
 		}
 		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
