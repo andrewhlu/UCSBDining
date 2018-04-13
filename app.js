@@ -409,7 +409,7 @@ bot.dialog('selectFavorites', [
 
 		var choices = [];
 
-		for(var i = 0, i < dcMenuArray.length, i++) {
+		for(var i = 0; i < dcMenuArray.length; i++) {
 			if(dcMenuArray[i] != undefined) {
 				var addChoice = {
 					value: i,
