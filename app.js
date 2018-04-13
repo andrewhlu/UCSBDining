@@ -169,13 +169,13 @@ bot.dialog('FindDC', [
 
 				//Remove all dt and content inside
 				carrilloBody = carrilloBody.replace(/(<dt>)([\w\s])+(<\/dt>)/g, '');
-				console.log(carrilloBody);
 
 				//Remove all dd tags
 				carrilloBody = carrilloBody.replace(/(<dd>)/g, '');
 
 				//Replace all /dd tags with a newline
 				carrilloBody = carrilloBody.replace(/(<\/dd>)/g, '\n');
+				console.log(carrilloBody);
 
 			});
 		}
