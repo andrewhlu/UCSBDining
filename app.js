@@ -36,8 +36,11 @@ var tableName = 'botdata';
 var azureTableClient = new botbuilder_azure.AzureTableClient(tableName, process.env['AzureWebJobsStorage']);
 var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azureTableClient);
 
-//Define global requestBody for request function
+//Define global variables here
 var requestBody = "blank";
+var mealname = "blank";
+var requestString = "blank";
+var dcMenuArray = [];
 
 // Create your bot with a function to receive messages from the user
 
@@ -67,19 +70,10 @@ bot.dialog('Startup', [
 		//add a FindDCFuture for future meals
 		//add first time script
 
-		session.userData.userPreferences = ["BBQ Spareribs","Salad","Grilled Pork Tacos","Krinkle Cut Fries"]; //remove this line!!
 		var preferences = session.userData.userPreferences;
 		console.log(preferences);
 
-		if(preferences == undefined) {
-			var sayString = "Hello, " + name + "! It looks like it's your first time here! Let's get you set up.";
-			session.say(sayString, sayString);
-
-			
-			var preferences = session.userData.userPreferences;
-			console.log(preferences);
-		}
-		else if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			//run finished script
 		}
 		else if(ans.search("eat") >= 0 || ans.search("good") >= 0 || ans.search("food") >= 0 || ans.search("hungry") >= 0) {
@@ -148,7 +142,7 @@ bot.dialog('FindDC', [
 		//5 = late night
 		//0 = closed for day
 		
-		var mealname = [0,"Breakfast","Brunch","Lunch","Dinner","Late Night"];
+		var mealname = [0,"Breakfast","Brunch","Lunch","Dinner","LateNight"];
 		
 		var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + mealname[dchours[weekday][hour]];
 		console.log(requestString);
@@ -157,23 +151,13 @@ bot.dialog('FindDC', [
 			session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!","Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
 		}
 		else {
-			// request(requestString, function (error, response, body) {
-			// 	console.log('error:', error); // Print the error if one occurred
-			// 	console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-			// 	requestBody = body;
-			// 	console.log("Request Body 1: " + requestBody);
-			// });
-			// console.log("Request Body 2: " + requestBody);
-
 			fetch(requestString)
 		    .then(res => res.text())
 		    .then(body => {
 		    	requestBody = body;
-		    	console.log("Request Body 1: " + requestBody);
-		    	session.say("This worked!","This worked!");
 		    });
 			
-			setTimeout(function(){ console.log("Request Body 2: " + requestBody); }, 3000);
+			setTimeout(function(){ console.log("success"); }, 3000);
 			
 			//Extract menus from website
 			const analyze = cheerio.load(requestBody);
@@ -210,6 +194,258 @@ bot.dialog('FindDC', [
 			session.say(sayString, sayString);
 		}
 	}
+]);
+
+bot.dialog('RateMeal', [
+	function (session) {
+		var utcdate = new Date(); //Local time is UTC
+		var utcMilli = utcdate.getTime();
+		
+		var date = new Date(utcMilli - 25200000); //Converts UTC time to PST
+		console.log(date.toLocaleString());
+		
+		var weekday = date.getDay();
+
+		if(weekday >= 1 && weekday <= 4) {
+			//mon to thurs
+			var choices = [
+	            {value: 'breakfast', action: {title: 'Today\'s Breakfast'}, synonyms: 'morning'},
+	            {value: 'lunch', action: {title: 'Today\'s Lunch'}, synonyms: 'afternoon'},
+	            {value: 'dinner', action: {title: 'Today\'s Dinner'}, synonyms: 'supper|night'},
+	            {value: 'latenight', action: {title: 'Today\'s Late Night'}, synonyms: 'midnight'},
+	            {value: 'other', action: {title: 'Another Meal'}, synonyms: 'something else|another time|another meal'}
+	        ];
+			
+			var string = "What meal would you like to rate?";
+	        
+	        builder.Prompts.choice(session, string, choices, {
+	            listStyle: builder.ListStyle.button,
+	            speak: speak(session, string) 
+	        });
+		}
+		else if(weekday == 5) {
+			//fri
+			var choices = [
+	            {value: 'breakfast', action: {title: 'Today\'s Breakfast'}, synonyms: 'morning'},
+	            {value: 'lunch', action: {title: 'Today\'s Lunch'}, synonyms: 'afternoon'},
+	            {value: 'dinner', action: {title: 'Today\'s Dinner'}, synonyms: 'supper|night'},
+	            {value: 'other', action: {title: 'Another Meal'}, synonyms: 'something else|another time|another meal'}
+	        ];
+			
+			var string = "What meal would you like to rate?";
+	        
+	        builder.Prompts.choice(session, string, choices, {
+	            listStyle: builder.ListStyle.button,
+	            speak: speak(session, string) 
+	        });
+		}
+		else if(weekday == 0 || weekday == 6) {
+			//weekend
+			var choices = [
+	            {value: 'brunch', action: {title: 'Today\'s Brunch'}, synonyms: 'morning|afternoon|breakfast|lunch'},
+	            {value: 'dinner', action: {title: 'Today\'s Dinner'}, synonyms: 'supper|night'},
+	            {value: 'other', action: {title: 'Another Meal'}, synonyms: 'something else|another time|another meal'}
+	        ];
+			
+			var string = "What meal would you like to rate?";
+	        
+	        builder.Prompts.choice(session, string, choices, {
+	            listStyle: builder.ListStyle.button,
+	            speak: speak(session, string) 
+	        });
+		}
+	},
+	function (session, results) {
+		var ans = results.response.entity;
+		var msg = "You entered: " + ans;
+		console.log(msg);
+
+		var utcdate = new Date(); //Local time is UTC
+		var utcMilli = utcdate.getTime();
+		
+		var date = new Date(utcMilli - 25200000); //Converts UTC time to PST
+		console.log(date.toLocaleString());
+		
+		var year = date.getFullYear();
+		var month = parseInt(date.getMonth()) + 1;
+		var day = date.getDate();
+		var weekday = date.getDay();
+		var hour = date.getHours();
+		
+		var dateString = year + "-" + month + "-" + day;
+
+
+		if(weekday >= 1 && weekday <= 4) {
+			if(ans.search("breakfast") >= 0 || ans.search("morning") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Breakfast";
+				mealname = "Breakfast";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else if(ans.search("lunch") >= 0 || ans.search("afternoon") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Lunch";
+				mealname = "Lunch";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else if(ans.search("dinner") >= 0 || ans.search("supper") >= 0 || ans.search("night") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Dinner";
+				mealname = "Dinner";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else if(ans.search("late night") >= 0 || ans.search("midnight") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=LateNight";
+				mealname = "Late Night";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else {
+				session.say("Sorry, I don't understand. Let's try again.","Sorry, I don't understand. Let's try again.");
+				session.replaceDialog('RateMeal');
+			}
+		}
+		else if(weekday == 5) {
+			if(ans.search("breakfast") >= 0 || ans.search("morning") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Breakfast";
+				mealname = "Breakfast";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else if(ans.search("lunch") >= 0 || ans.search("afternoon") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Lunch";
+				mealname = "Lunch";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else if(ans.search("dinner") >= 0 || ans.search("supper") >= 0 || ans.search("night") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Dinner";
+				mealname = "Dinner";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else {
+				session.say("Sorry, I don't understand. Let's try again.","Sorry, I don't understand. Let's try again.");
+				session.replaceDialog('RateMeal');
+			}
+		}
+		else if(weekday == 0 || weekday == 6) {
+			if(ans.search("brunch") >= 0 || ans.search("morning") >= 0|| ans.search("afternoon") >= 0|| ans.search("breakfast") >= 0|| ans.search("lunch") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Brunch";
+				mealname = "Brunch";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else if(ans.search("dinner") >= 0 || ans.search("supper") >= 0 || ans.search("night") >= 0) {
+				requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=Dinner";
+				mealname = "Dinner";
+				session.replaceDialog('RateSelectedMeal');
+			}
+			else {
+				session.say("Sorry, I don't understand. Let's try again.","Sorry, I don't understand. Let's try again.");
+				session.replaceDialog('RateMeal');
+			}
+		}
+	}
+]);
+
+bot.dialog('RateSelectedMeal', [
+	function (session) {
+		var choices = [
+            {value: 'Carrillo', action: {title: 'Carrillo'}, synonyms: 'first'},
+            {value: 'DeLaGuerra', action: {title: 'De La Guerra (DLG)'}, synonyms: 'de la guerra|DLG|second'},
+            {value: 'Ortega', action: {title: 'Ortega'}, synonyms: 'third'},
+            {value: 'Portola', action: {title: 'Portola'}, synonyms: 'fourth|last'}
+        ];
+		
+		var string = "Great! Where did you eat?";
+        
+        builder.Prompts.choice(session, string, choices, {
+            listStyle: builder.ListStyle.button,
+            speak: speak(session, string) 
+        });
+	},
+	function (session, results) {
+		var ans = results.response.entity;
+		var msg = "You entered: " + ans;
+		console.log(msg);
+
+		session.say("Great! Let's pull up the menu.","Great! Let's pull up the menu.");
+
+		console.log(requestString);
+
+		fetch(requestString)
+	    .then(res => res.text())
+	    .then(body => {
+	    	requestBody = body;
+	    });
+		
+		setTimeout(function(){ console.log("success"); }, 3000);
+		
+		//Extract menus from website
+		const analyze = cheerio.load(requestBody);
+
+		if(ans.search("Carrillo") >= 0) {
+			var menuBody = analyze('#Carrillo-body .panel-body').html();
+		}
+		else if(ans.search("DeLaGuerra") >= 0 || ans.search("De La Guerra") >= 0 || ans.search("DLG") >= 0) {
+			var menuBody = analyze('#DeLaGuerra-body .panel-body').html();
+		}
+		else if(ans.search("Ortega") >= 0) {
+			var menuBody = analyze('#Ortega-body .panel-body').html();
+		}
+		else if(ans.search("Portola") >= 0) {
+			var menuBody = analyze('#Portola-body .panel-body').html();
+		}
+
+		//Send menu to menuregex function
+		var dcMenu = menuregex(menuBody);
+
+		//Convert menu string to array
+		dcMenuArray = dcMenu.split("\n");
+		console.log(dcMenuArray);
+
+		//Move to selectFavorites dialog
+		session.replaceDialog('selectFavorites');
+	}
+
+]);
+
+bot.dialog('selectFavorites', [
+	function (session) {
+		console.log(dcMenuArray);
+
+		var choices = [];
+
+		for(var i = 0, i > dcMenuArray.length, i++) {
+			if(dcMenuArray[i] != undefined) {
+				var addChoice = {
+					value: i,
+					action: {
+						title: dcMenuArray[i]
+					}
+				};
+
+				choices.push(addChoice);
+			}
+		}
+		
+		var string = "Tap on an item to add it to your favorites.";
+        
+        builder.Prompts.choice(session, string, choices, {
+            listStyle: builder.ListStyle.button,
+            speak: speak(session, string) 
+        });
+	},
+	function(session, results) {
+		var ans = results.response.entity;
+		var msg = "You entered: " + ans;
+		console.log(msg);
+
+		//Get user preferences
+		var preferences = session.userData.userPreferences;
+
+		preferences.push(dcMenuArray[i]);
+		session.userData.userPreferences = preferences;
+
+		delete dcMenuArray[i];
+
+		session.say("Great! Any others?","Great! Any others?");
+		session.replaceDialog('selectFavorites');
+	}
+
 ]);
 
 // Helper function to wrap SSML stored in the prompts file with <speak/> tag.
