@@ -169,11 +169,8 @@ bot.dialog('FindDC', [
 		    .then(res => res.text())
 		    .then(body => {
 		    	requestBody = body;
-		    	console.log("Request Body 1: " + requestBody);
-		    	session.say("This worked!","This worked!")
 		    });
 
-			console.log("Request Body 2: " + requestBody);
 			//Extract menus from website
 			const analyze = cheerio.load(requestBody);
 			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
@@ -205,7 +202,7 @@ bot.dialog('FindDC', [
 			var dc = ["Carrillo", "DLG", "Ortega", "Portola"];
 			console.log(dc[result]);
 
-			var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + "items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
+			var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + " items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
 			session.say(sayString, sayString);
 		}
 	}
