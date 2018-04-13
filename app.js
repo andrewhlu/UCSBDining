@@ -137,33 +137,23 @@ bot.dialog('FindDC', [
 		console.log(requestString);
 		
 		request(requestString, function (error, response, body) {
-			  console.log('error:', error); // Print the error if one occurred
-			  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-			  console.log('body:', body);
+			console.log('error:', error); // Print the error if one occurred
+			console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+			console.log('body:', body);
 
-			  //analyzeMeal(body);
-			});
+			//analyzeMeal(body);
+			const analyze = cheerio.load(body);
+			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
+			var delaguerraBody = analyze('#DeLaGuerra-body .panel-body').html();
+			var ortegaBody = analyze('#Ortega-body .panel-body').html();
+			var portolaBody = analyze('#Portola-body .panel-body').html();
+		});
 
 
 
 		//session.say("Oh no. It looks like all the Dining Commons have closed for the remainder of the day. Sorry!");
 
 		
-		// //User Info
-		// if(session.message && session.message.entities){
-		// 	var userInfo = session.message.entities.find((e) => {
-		// 		return e.type === 'UserInfo';
-		// 	});
-	
-		// 	if (userInfo) {
-		// 		var name = userInfo.name.GivenName;
-		// 		var email = userInfo.email;
-		// 		console.log(email);
-		// 	}
-		// }
-		
-		
-
 		
 		//scrap the website
 		//extract the meal time
@@ -195,17 +185,6 @@ bot.dialog('FindDC', [
 	}
 ]);
 
-bot.dialog('AnalyzeMenu', [
-	function analyzeMeal(body) {
-		const analyze = cheerio.load(body);
-		var carrillo = analyze('#Carrillo-body .panel-body').html();
-		var dlg = analyze('#DeLaGuerra-body .panel-body').html();
-		var ortega = analyze('#Ortega-body .panel-body').html();
-		var portola = analyze('#Portola-body .panel-body').html();
-	}
-]);
-
-
 
 
 // Helper function to wrap SSML stored in the prompts file with <speak/> tag.
@@ -213,11 +192,3 @@ function speak(session, prompt) {
 	var localized = session.gettext(prompt);
 	return ssml.speak(localized);
 }
-
-// function analyzeMeal(body) {
-// 	const analyze = cheerio.load(body);
-// 	var carrillo = analyze('#Carrillo-body .panel-body').html();
-// 	var dlg = analyze('#DeLaGuerra-body .panel-body').html();
-// 	var ortega = analyze('#Ortega-body .panel-body').html();
-// 	var portola = analyze('#Portola-body .panel-body').html();
-// }
