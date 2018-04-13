@@ -158,7 +158,6 @@ bot.dialog('FindDC', [
 			request(requestString, function (error, response, body) {
 				console.log('error:', error); // Print the error if one occurred
 				console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-				//console.log('body:', body);
 
 				//Extract menus from website
 				const analyze = cheerio.load(body);
@@ -167,17 +166,21 @@ bot.dialog('FindDC', [
 				var ortegaBody = analyze('#Ortega-body .panel-body').html();
 				var portolaBody = analyze('#Portola-body .panel-body').html();
 
-				//The master replace line
-				//carrilloBody = carrilloBody.replace(/(\n)(\s)+/g, '').replace(/(<dl>)/g, '').replace(/(<\/dl>)/g, '').replace(/(amp;)/g, '').replace(/(<dt>)([\w\s\(\)])+(<\/dt>)/g, '').replace(/(<dd>)/g, '').replace(/(<\/dd>)/g, '\n');
-				
 				//Send menus to menuregex function
 				var carrilloMenu = menuregex(carrilloBody);
 				var delaguerraMenu = menuregex(delaguerraBody);
 				var ortegaMenu = menuregex(ortegaBody);
 				var portolaMenu = menuregex(portolaBody);
 
+				//Get user preferences
+				var preferences = session.userData.userPreferences;
+				console.log(preferences);
 
-
+				//Analyze menus with user preferences
+				var carrilloResult = analyzeMenu(carrilloMenu, preferences);
+				var delaguerraResult = analyzeMenu(delaguerraMenu, preferences);
+				var ortegaResult = analyzeMenu(ortegaMenu, preferences);
+				var portolaResult = analyzeMenu(portolaMenu, preferences);
 				
 
 			});
@@ -219,8 +222,6 @@ bot.dialog('FindDC', [
 	}
 ]);
 
-
-
 // Helper function to wrap SSML stored in the prompts file with <speak/> tag.
 function speak(session, prompt) {
 	var localized = session.gettext(prompt);
@@ -248,7 +249,22 @@ function menuregex(menu) {
 	//Replace all /dd tags with a newline
 	menu = menu.replace(/(<\/dd>)/g, '\n');
 
-	console.log(menu);
-
 	return menu;
+}
+
+function analyzeMenu(menu, preferences) {
+	var goodfoodcount = 0;
+	var goodfood = [];
+
+	for(i = preferences.length; i > 0; i--) {
+		if(menu.search(preferences[i]) > 0) {
+			goodfoodcount = goodfoodcount + 1;
+			goodfood.unshift(preferences[i]);
+		}
+	}
+
+	console.log("User likes " + goodfoodcount + " items.");
+	console.log(goodfood);
+
+	return [goodfoodcount, goodfood];
 }
