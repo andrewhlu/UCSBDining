@@ -18,9 +18,9 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
   
 // Create chat connector for communicating with the Bot Framework Service
 var connector = new builder.ChatConnector({
-    appId: process.env.MicrosoftAppId,
-    appPassword: process.env.MicrosoftAppPassword,
-    openIdMetadata: process.env.BotOpenIdMetadata
+	appId: process.env.MicrosoftAppId,
+	appPassword: process.env.MicrosoftAppPassword,
+	openIdMetadata: process.env.BotOpenIdMetadata
 });
 
 // Listen for messages from users 
@@ -39,106 +39,122 @@ var tableStorage = new botbuilder_azure.AzureBotStorage({ gzipData: false }, azu
 // Create your bot with a function to receive messages from the user
 
 var bot = new builder.UniversalBot(connector, function (session) {
-    var ans = results.response.entity;
-    var msg = "You entered: " + ans;
-    console.log(msg);
-    
-    if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
-        //run finished script
-    }
-    
-    
-    //session.send(msg);
-    
-    
-    
-    session.replaceDialog('FindDC');
+	var ans = results.response.entity;
+	var msg = "You entered: " + ans;
+	console.log(msg);
+
+	//User Info stuff. Play around with this later.
+	// if(session.message && session.message.entities){
+	// 	var userInfo = session.message.entities.find((e) => {
+	// 		return e.type === 'UserInfo';
+	// 	});
+
+	// 	if (userInfo) {
+	// 		var name = userInfo['UserName'];
+	// 		var email = userInfo['UserEmail'];
+
+	// 		if(email && email !== ''){
+	// 			//Do something with the user's email address.
+	// 		}
+	// 	}
+	// }
+	
+	if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+		//run finished script
+	}
+	else {
+		session.replaceDialog('FindDC');
+	}
 });
-    
+	
 bot.dialog('FindDC', [
-    function (session) {        
-        //get initial text
-        //see if they passed a meal period over (breakfast, lunch, dinner)
-        //if not, then take the next meal
-        
-        session.say("Let me look at the menus.","Let me look at the menus.");
-        
-        requestMeal(3);
-        
-        
-        // var body = fetch('https://appl.housing.ucsb.edu/menu/day/?dc=Carrillo&dc=DeLaGuerra&dc=Ortega&dc=Portola&m=Breakfast')
-        //     .then(res => res.text())
-        //     .then(body => cheerio.load(body));
-                  
-        //   .then(menu => ('#Carrillo-body dd').html())
-        //   .then(console.log(menu));
-        
-        
-        //const $ = cheerio.load(test)
-        
-        //scrap the website
-        //extract the meal time
-        //extract the menus
-        //compare with your tallies
-        //dc with most tallies gets chosen and returned
-        
-        
-        
-    },
-    function (session, results) {
-        var ans = results.response.entity;
-        var msg = "You entered: " + ans;
-        console.log(msg);
-        //session.send(msg);
-        
-        session.say(msg, msg);
-        
-        // name = results.response;
-        builder.Prompts.text(session, "We need a little more information about you to predict your favorite dog. Hang in there and tell me your current city");
-    },
-    function (session, results) {
-        city = results.response;
-        var msg = "Name: " + name + "<br/> City: " + city;
-        console.log(msg);
-        session.send(msg);
-        
-        session.send("Thanks. We're launching a webpage for you."); 
-    }
+	function (session) {       
+		var ans = results.response.entity;
+		var msg = "You entered: " + ans;
+		console.log(msg); 
+		
+		//get initial text
+		//see if they passed a meal period over (breakfast, lunch, dinner)
+		//if not, then take the next meal
+		
+		session.say("Let me look at the menus.","Let me look at the menus.");
+		
+		requestMeal(3);
+		
+		
+		// var body = fetch('https://appl.housing.ucsb.edu/menu/day/?dc=Carrillo&dc=DeLaGuerra&dc=Ortega&dc=Portola&m=Breakfast')
+		//     .then(res => res.text())
+		//     .then(body => cheerio.load(body));
+				  
+		//   .then(menu => ('#Carrillo-body dd').html())
+		//   .then(console.log(menu));
+		
+		
+		//const $ = cheerio.load(test)
+		
+		//scrap the website
+		//extract the meal time
+		//extract the menus
+		//compare with your tallies
+		//dc with most tallies gets chosen and returned
+		
+		
+		
+	},
+	function (session, results) {
+		var ans = results.response.entity;
+		var msg = "You entered: " + ans;
+		console.log(msg);
+		//session.send(msg);
+		
+		session.say(msg, msg);
+		
+		// name = results.response;
+		builder.Prompts.text(session, "We need a little more information about you to predict your favorite dog. Hang in there and tell me your current city");
+	},
+	function (session, results) {
+		city = results.response;
+		var msg = "Name: " + name + "<br/> City: " + city;
+		console.log(msg);
+		session.send(msg);
+		
+		session.send("Thanks. We're launching a webpage for you."); 
+	}
 ]);
 
 /** Helper function to wrap SSML stored in the prompts file with <speak/> tag. */
 function speak(session, prompt) {
-    var localized = session.gettext(prompt);
-    return ssml.speak(localized);
+	var localized = session.gettext(prompt);
+	return ssml.speak(localized);
 }
 
 //Request function
 function requestMeal(meal) {
-    var meals = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late Night"];
-    
-    var date = new Date();
-    console.log(date.toLocaleString());
-    
-    var month = parseInt(date.getMonth()) + 1;
-    
-    var dateString = date.getFullYear() + "-" + month + "-" + date.getDate();
-    
-    var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + meals[meal];
-    console.log(requestString);
-    
-    request(requestString, function (error, response, body) {
-          console.log('error:', error); // Print the error if one occurred
-          console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-          analyzeMeal(body);
-        });
+	var meals = ["Breakfast", "Brunch", "Lunch", "Dinner", "Late Night"];
+	
+	var date = new Date();
+	console.log(date.toLocaleString());
+	
+	var month = parseInt(date.getMonth()) + 1;
+	
+	var dateString = date.getFullYear() + "-" + month + "-" + date.getDate();
+	
+	var requestString = "https://appl.housing.ucsb.edu/menu/day/?d=" + dateString + "&m=" + meals[meal];
+	console.log(requestString);
+	
+	request(requestString, function (error, response, body) {
+		  console.log('error:', error); // Print the error if one occurred
+		  console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
+		  analyzeMeal(body);
+		});
 }
 
 function analyzeMeal(body) {
-    //console.log(body);
-    
-    const analyze = cheerio.load(body);
-    var result1 = analyze('#Carrillo-body .panel-body').html();
-    console.log(result1);
-    // var result2 = analyze('#Ortega-body dl').html();
-    // console.log(result2);
+	//console.log(body);
+	
+	const analyze = cheerio.load(body);
+	var result1 = analyze('#Carrillo-body .panel-body').html();
+	console.log(result1);
+	// var result2 = analyze('#Ortega-body dl').html();
+	// console.log(result2);
 }
