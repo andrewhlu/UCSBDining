@@ -160,10 +160,11 @@ bot.dialog('FindDC', [
 			request(requestString, function (error, response, body) {
 				console.log('error:', error); // Print the error if one occurred
 				console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-				console.log("Request Body: " + requestBody);
 				requestBody = body;
+				console.log("Request Body 1: " + requestBody);
 			});
-			
+			console.log("Request Body 2: " + requestBody);
+
 			//Extract menus from website
 			const analyze = cheerio.load(requestBody);
 			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
