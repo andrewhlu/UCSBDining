@@ -169,8 +169,12 @@ bot.dialog('FindDC', [
 		    .then(res => res.text())
 		    .then(body => {
 		    	requestBody = body;
+		    	console.log("Request Body 1: " + requestBody);
+		    	session.say("This worked!","This worked!");
 		    });
-
+			
+			setTimeout(function(){ console.log("Request Body 2: " + requestBody); }, 3000);
+			
 			//Extract menus from website
 			const analyze = cheerio.load(requestBody);
 			var carrilloBody = analyze('#Carrillo-body .panel-body').html();
