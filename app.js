@@ -193,7 +193,7 @@ bot.dialog('FindDC', [
 
 				var sayString = "I think you'll like " + dc[result] + "! They have " + carrilloResult[0] + " items that you like, including " + carrilloResult[1][0] + ", " + carrilloResult[1][1] + ", and " + carrilloResult[1][2] + ".";
 				session.say(sayString, sayString);
-			}, 5000);
+			}, 2000);
 			
 			
 		}
@@ -402,7 +402,7 @@ bot.dialog('RateSelectedMeal', [
 	
 			//Move to selectFavorites dialog
 			session.replaceDialog('selectFavorites');
-		}, 3000);
+		}, 2000);
 	}
 ]);
 
