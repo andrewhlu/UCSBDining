@@ -398,7 +398,6 @@ bot.dialog('RateSelectedMeal', [
 	
 			//Convert menu string to array
 			dcMenuArray = dcMenu.split("\n");
-			console.log(dcMenuArray);
 	
 			//Move to selectFavorites dialog
 			session.replaceDialog('selectFavorites');
@@ -408,8 +407,6 @@ bot.dialog('RateSelectedMeal', [
 
 bot.dialog('selectFavorites', [
 	function (session) {
-		console.log(dcMenuArray);
-
 		var choices = [];
 
 		for(var i = 0; i < dcMenuArray.length; i++) {
@@ -420,6 +417,7 @@ bot.dialog('selectFavorites', [
 						title: dcMenuArray[i]
 					}
 				};
+				console.log(addChoice);
 
 				choices.push(addChoice);
 			}
@@ -485,7 +483,7 @@ function analyzeMenu(menu, preferences) {
 	var goodfoodcount = 0;
 	var goodfood = [];
 
-	for(i = preferences.length; i > 0; i--) {
+	for(var i = preferences.length; i > 0; i--) {
 		if(menu.search(preferences[i]) > 0) {
 			goodfoodcount = goodfoodcount + 1;
 			goodfood.unshift(preferences[i]);
