@@ -73,7 +73,7 @@ bot.dialog('Startup', [
 		var preferences = session.userData.userPreferences;
 		console.log(preferences);
 
-		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+		if(ans.search("rate") >= 0 || ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			session.say("Great! Let's rate your meal.","Great! Let's rate your meal.");
 			session.replaceDialog('RateMeal');
 		}
@@ -105,7 +105,7 @@ bot.dialog('Startup', [
 		//add a FindDCFuture for future meals
 		//add first time script
 		
-		if(ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
+		if(ans.search("rate") >= 0 || ans.search("finished") >= 0 || ans.search("finish") >= 0 || ans.search("done") >= 0) {
 			session.say("Great! Let's rate your meal.","Great! Let's rate your meal.");
 			session.replaceDialog('RateMeal');
 		}
