@@ -1,27 +1,10 @@
-## Use Azure app service editor
+# UCSB Dining Cortana Skill
+### A Cortana skill that recommends a Dining Common based on food that you like. 
 
-1. make code change in the online editor
+Honorable Mention Recipient from Microsoft!
 
-Your code changes go live as the code changes are saved.
+Many UCSB students with a meal plan often find themselves checking the dining menus multiple times every day. However, students are often busy, and checking the menus can be time-consuming or even impossible in some cases. What if we could make it easier to find the food you like?
 
-## Use Visual Studio Code
+The UCSB Dining Cortana Skill recommends you a Dining Common based on past foods you like. All you have to do is ask UCSB Dining to find you a place to eat, in Cortana.
 
-### Build and debug
-1. download source code zip and extract source in local folder
-2. open the source folder in  Visual Studio Code
-3. make code changes
-4. download and run [botframework-emulator](https://emulator.botframework.com/)
-5. connect the emulator to http://localhost:3987
-
-### Publish back
-
-```
-npm run azure-publish
-```
-
-## Use continuous integration
-
-If you have setup continuous integration, then your bot will automatically deployed when new changes are pushed to the source repository.
-
-
-
+Cortana accomplishes this by asking you what foods you liked after your meal and recording your favorites in a database. When Cortana finds that a Dining Common has an item that you liked in the past, it will take that into account. The Dining Common with the most items matching your preferences will be selected and their menu will be read out to you.
